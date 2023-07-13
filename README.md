@@ -4,27 +4,25 @@
 
 
 ## Popis
-**Meeting Room Reservation System** umožní spravovat a rezervovat zasedací místnosti v kancelářích. Bude také podporovat stanovení prioritní místnosti, což znamená, že některé místnosti se dá zarezervovat v tom případě, když ostatní již obsazené v daný čas, nebo je bude schopen zarezervovat zaměstnanec s vyšší prioritou než jiné. Tuto prioritu lze nastavit v systému. Bude zobrazovat také atributy každé místnosti, jako je maximální kapacita účastníků a dostupné vybavení. Hlavně tento systém bude určen korporacím, které mají velké množství zaměstnanců, aby mohli zorganizovat práci v kanceláři.
+The Meeting Room Reservation System allows managing and reserving meeting rooms in offices. It also supports setting up priority rooms, which means that some rooms can be reserved when others are already booked at a specific time, or when an employee with a higher priority can reserve it over others. This priority can be set within the system. The system will also display attributes of each room, such as maximum capacity and available equipment. It is primarily designed for corporations with a large number of employees to facilitate office organization.
+## Functionality
+The Meeting Room Reservation System offers the following functionality:
 
-## Funkcionalita
-Role: Admin, uživatel.
-
-Výstupem tohoto projektu bude Browser-based Meeting Room Reservation System, který by umožnil:
 
 **Admin:**
-- nastavení priority zaměstnance
-- nastavení prioritní místností
-- nastavení atributů místnosti
-- zrušení rezervace zaměstnance
+- Setting employee priorities: Administrators can assign priority levels to employees, which determine their reservation privileges.
+- Setting priority rooms: Administrators can designate certain rooms as priority rooms, allowing them to be reserved even if other rooms are already booked.
+- Setting room attributes: Administrators can define and update attributes for each meeting room, such as maximum capacity and available equipment.
+- Cancelling employee reservations: Administrators have the ability to cancel reservations made by employees if necessary.
 
-**Uživatel:**
-- rezervace zasedací místnosti
-- zrušení rezervace
-- zobrazení atributů místnosti
-- automatická rezervace místností pro stálé meetingy. Například, HR chce pořádat schůzky každé první pondělí v měsíci
+**User**:
+- Reserving meeting rooms: Users can request reservations for available meeting rooms based on their assigned priority level.
+- Cancelling reservations: Users have the option to cancel their own reservations if their plans change.
+- Viewing room attributes: Users can access information about each meeting room, including its attributes and availability.
+- Automatic room reservation for recurring meetings: Users can schedule recurring meetings, such as monthly or weekly sessions, with the system automatically reserving a suitable room.
 
-## Tým
-Semenyug Volodymyr, Azizov Ramir, Tsay Vyacheslav
+## Team
+Azizov Ramir, Semenyug Volodymyr, Tsay Vyacheslav
 
 ## Stav projektu
-:gear: Hotov
+:gear: Ready

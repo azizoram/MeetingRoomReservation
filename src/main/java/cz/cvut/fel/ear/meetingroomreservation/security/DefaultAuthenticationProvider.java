@@ -15,6 +15,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Authentication provider implementation for handling authentication.
+ * Implements the AuthenticationProvider interface.
+ */
 @Service
 public class DefaultAuthenticationProvider implements AuthenticationProvider {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultAuthenticationProvider.class);
@@ -23,6 +27,12 @@ public class DefaultAuthenticationProvider implements AuthenticationProvider {
 
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Constructor for DefaultAuthenticationProvider class.
+     *
+     * @param customerDetailsService The CustomerDetailsService used for loading customer details.
+     * @param passwordEncoder        The PasswordEncoder used for password encoding and matching.
+     */
     @Autowired
     public DefaultAuthenticationProvider(CustomerDetailsService customerDetailsService,
                                          PasswordEncoder passwordEncoder){
@@ -30,6 +40,13 @@ public class DefaultAuthenticationProvider implements AuthenticationProvider {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Authenticates the provided authentication object.
+     *
+     * @param authentication The Authentication object to authenticate.
+     * @return An Authentication object representing the authenticated user.
+     * @throws AuthenticationException if the authentication fails.
+     */
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         final String username = authentication.getPrincipal().toString();
@@ -44,6 +61,12 @@ public class DefaultAuthenticationProvider implements AuthenticationProvider {
         return SecurityUtils.setCurrentCustomer(customerDetails);
     }
 
+    /**
+     * Checks if the authentication provider supports the specified authentication class.
+     *
+     * @param authentication The authentication class to check.
+     * @return true if the authentication provider supports the class, false otherwise.
+     */
     @Override
     public boolean supports(Class<?> authentication) {
         return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication) ||

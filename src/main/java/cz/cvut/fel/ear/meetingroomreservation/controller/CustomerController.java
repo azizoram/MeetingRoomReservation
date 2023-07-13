@@ -22,6 +22,10 @@ import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controller class for managing customers.
+ * Handles RESTful API endpoints related to customers.
+ */
 @RestController
 @RequestMapping("/rest/users")
 public class CustomerController {
@@ -31,23 +35,47 @@ public class CustomerController {
     private final CustomerService customerService;
     private final CustomerMapper mapper;
 
+    /**
+     * Constructor for CustomerController class.
+     *
+     * @param customerService The CustomerService used for managing customers.
+     * @param mapper          The CustomerMapper used for mapping Customer objects to CustomerDTO objects.
+     */
     @Autowired
     public CustomerController(CustomerService customerService, CustomerMapper mapper) {
         this.customerService = customerService;
         this.mapper = mapper;
     }
 
+    /**
+     * Retrieves a list of all customers.
+     *
+     * @return A List of CustomerDTO objects representing the customers.
+     */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CustomerDTO> getCustomers() {
         List<Customer> customers = customerService.findAllCustomers();
         return customers.stream().map(mapper::customerToCustomerDTO).collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves a customer by their ID.
+     *
+     * @param id The ID of the customer to retrieve.
+     * @return A Customer object representing the customer.
+     */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Customer getCustomerById(@PathVariable Long id) {
         return customerService.findCustomerById(id);
     }
 
+    /**
+     * Adds a new admin user.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param admin The Admin object to add.
+     * @return A ResponseEntity with the HTTP headers and status code indicating the result of the operation.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(value = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> addNewAdmin(@RequestBody Admin admin) {
@@ -57,6 +85,13 @@ public class CustomerController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
+    /**
+     * Adds a new worker user.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param worker The Worker object to add.
+     * @return A ResponseEntity with the HTTP headers and status code indicating the result of the operation.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(value = "/worker", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> addNewWorker(@RequestBody Worker worker) {
@@ -66,6 +101,13 @@ public class CustomerController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
+    /**
+     * Retrieves the currently authenticated customer.
+     * Only accessible to users with the 'ROLE_ADMIN' or 'ROLE_WORKER' role.
+     *
+     * @param principal The Principal object representing the authenticated user.
+     * @return A CustomerDTO object representing the currently authenticated customer.
+     */
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_WORKER')")
     @GetMapping(value = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomerDTO getCurrent(Principal principal) {
@@ -74,6 +116,12 @@ public class CustomerController {
         return mapper.customerToCustomerDTO(customer);
     }
 
+    /**
+     * Sets a worker as a priority worker.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param id The ID of the worker to set as a priority.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}/prior")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -83,6 +131,12 @@ public class CustomerController {
         LOG.debug("Worker with id {} is PRIOR", id);
     }
 
+    /**
+     * Sets a worker as a non-priority worker.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param id The ID of the worker to set as a non-priority.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}/nonprior")
     @ResponseStatus(HttpStatus.NO_CONTENT)

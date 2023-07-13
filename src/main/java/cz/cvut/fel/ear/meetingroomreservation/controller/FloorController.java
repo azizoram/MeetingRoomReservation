@@ -20,6 +20,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controller class for managing floors.
+ * Handles RESTful API endpoints related to floors.
+ */
 @RestController
 @RequestMapping("rest/floors")
 public class FloorController {
@@ -29,18 +33,36 @@ public class FloorController {
     private final FloorService floorService;
     private final FloorMapper mapper;
 
+    /**
+     * Constructor for FloorController class.
+     *
+     * @param floorService The FloorService used for managing floors.
+     * @param mapper       The FloorMapper used for mapping Floor entities to FloorDTO objects.
+     */
     @Autowired
     public FloorController(FloorService floorService, FloorMapper mapper) {
         this.floorService = floorService;
         this.mapper = mapper;
     }
 
+    /**
+     * Retrieves a list of all floors.
+     *
+     * @return A List of FloorDTO objects representing the floors.
+     */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<FloorDTO> getFloors() {
         List<Floor> floors = floorService.findAllFloors();
         return floors.stream().map(mapper::entityToDTO).collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves a floor by its ID.
+     *
+     * @param id The ID of the floor to retrieve.
+     * @return A FloorDTO object representing the floor.
+     * @throws NotFoundException if the floor with the specified ID is not found.
+     */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public FloorDTO getFloorById(@PathVariable Long id) {
         final Floor floor = floorService.findFloorById(id);
@@ -50,7 +72,13 @@ public class FloorController {
         return mapper.entityToDTO(floor);
     }
 
-    //ADMIN
+    /**
+     * Adds a new floor.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param floor The Floor object to add.
+     * @return A ResponseEntity with the HTTP headers and status code indicating the result of the operation.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> addNewFloor(@RequestBody Floor floor) {
@@ -60,7 +88,16 @@ public class FloorController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    //ADMIN
+
+    /**
+     * Updates an existing floor.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param id    The ID of the floor to update.
+     * @param floor The updated Floor object.
+     * @throws NotFoundException    if the floor with the specified ID is not found.
+     * @throws ValidationException  if the ID in the request data does not match the ID in the request URL.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)

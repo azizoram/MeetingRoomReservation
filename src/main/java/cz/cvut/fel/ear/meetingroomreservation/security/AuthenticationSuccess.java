@@ -15,6 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Service class for handling successful authentication and logout.
+ * Implements the AuthenticationSuccessHandler and LogoutSuccessHandler interfaces.
+ */
 @Service
 public class AuthenticationSuccess implements AuthenticationSuccessHandler, LogoutSuccessHandler {
 
@@ -22,6 +26,12 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
 
     private final ObjectMapper mapper;
 
+    /**
+     * Retrieves the username from the authenticated user.
+     *
+     * @param authentication The Authentication object containing the user's authentication information.
+     * @return The username of the authenticated user.
+     */
     private String getUsername(Authentication authentication){
         if (authentication == null){
             return "";
@@ -29,11 +39,24 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
         return ((CustomerDetails) authentication.getPrincipal()).getUsername();
     }
 
+    /**
+     * Constructor for AuthenticationSuccess class.
+     *
+     * @param mapper The ObjectMapper used for JSON serialization.
+     */
     @Autowired
     public AuthenticationSuccess(ObjectMapper mapper){
         this.mapper = mapper;
     }
 
+    /**
+     * Handles successful authentication.
+     *
+     * @param request        The HttpServletRequest object.
+     * @param response       The HttpServletResponse object.
+     * @param authentication The Authentication object containing the user's authentication information.
+     * @throws IOException if an I/O error occurs during response writing.
+     */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
@@ -46,7 +69,14 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
         mapper.writeValue(response.getOutputStream(), loginStatus);
     }
 
-
+    /**
+     * Handles successful logout.
+     *
+     * @param request        The HttpServletRequest object.
+     * @param response       The HttpServletResponse object.
+     * @param authentication The Authentication object containing the user's authentication information.
+     * @throws IOException if an I/O error occurs during response writing.
+     */
     @Override
     public void onLogoutSuccess(HttpServletRequest request,
                                 HttpServletResponse response,
@@ -57,5 +87,5 @@ public class AuthenticationSuccess implements AuthenticationSuccessHandler, Logo
 
         mapper.writeValue(response.getOutputStream(), loginStatus);
     }
-    ///aaaaaaaaaaaaaaaaaaaaaa
+
 }

@@ -21,6 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controller class for managing rooms.
+ * Handles RESTful API endpoints related to rooms.
+ */
 @RestController
 @RequestMapping("rest/rooms")
 public class RoomController {
@@ -30,18 +34,36 @@ public class RoomController {
     private final RoomService roomService;
     private final RoomMapper mapper;
 
+    /**
+     * Constructor for RoomController class.
+     *
+     * @param roomService The RoomService used for managing rooms.
+     * @param mapper      The RoomMapper used for mapping Room entities to RoomDTO objects.
+     */
     @Autowired
     public RoomController(RoomService roomService, RoomMapper mapper) {
         this.roomService = roomService;
         this.mapper = mapper;
     }
 
+    /**
+     * Retrieves a list of all rooms.
+     *
+     * @return A List of RoomDTO objects representing the rooms.
+     */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<RoomDTO> getRooms() {
         List<Room> rooms = roomService.findAllRooms();
         return rooms.stream().map(mapper::entityToDTO).collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves a room by its ID.
+     *
+     * @param id The ID of the room to retrieve.
+     * @return A Room object representing the room.
+     * @throws NotFoundException if the room with the specified ID is not found.
+     */
     @GetMapping(value =  "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Room getRoomById(@PathVariable Long id) {
         final Room room = roomService.findRoomById(id);
@@ -51,12 +73,26 @@ public class RoomController {
         return room;
     }
 
+    /**
+     * Retrieves a list of room alterations for a room.
+     * Accessible to users with the 'ROLE_WORKER' or 'ROLE_ADMIN' role.
+     *
+     * @param id The ID of the room to retrieve the alterations for.
+     * @return A List of RoomAlteration objects representing the room alterations.
+     */
     @PreAuthorize("hasAnyRole('ROLE_WORKER', 'ROLE_ADMIN')")
     @GetMapping(value = "/{id}/alters", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<RoomAlteration> getAlters(@PathVariable Long id) {
         return getRoomById(id).getRoomAlterations();
     }
 
+    /**
+     * Adds a new room.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param room The Room object to add.
+     * @return A ResponseEntity with the HTTP headers and status code indicating the result of the operation.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> addNewRoom(@RequestBody Room room) {
@@ -66,7 +102,15 @@ public class RoomController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    //    ADMIN
+    /**
+     * Updates an existing room.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param id   The ID of the room to update.
+     * @param room The updated Room object.
+     * @throws NotFoundException    if the room with the specified ID is not found.
+     * @throws ValidationException  if the ID in the request data does not match the ID in the request URL.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -82,6 +126,13 @@ public class RoomController {
         LOG.debug("Updated room {}.", room.getRid());
     }
 
+    /**
+     * Creates a new reservation on a non-priority room.
+     * Accessible to users with the 'ROLE_WORKER' role.
+     *
+     * @param id          The ID of the room to create the reservation on.
+     * @param reservation The Reservation object to create.
+     */
     @PreAuthorize("hasRole('ROLE_WORKER')")
     @PostMapping(value = "/{id}/newnon", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -95,6 +146,13 @@ public class RoomController {
         LOG.debug("Reservation on NONPRIOR room has been added");
     }
 
+    /**
+     * Creates a new reservation on a priority room.
+     * Accessible to users with the 'ROLE_WORKER' role.
+     *
+     * @param id          The ID of the room to create the reservation on.
+     * @param reservation The Reservation object to create.
+     */
     @PreAuthorize("hasRole('ROLE_WORKER')")
     @PostMapping(value = "/{id}/newprior", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -108,6 +166,12 @@ public class RoomController {
         LOG.debug("Reservation on PRIOR room has been added");
     }
 
+    /**
+     * Creates a new weekly reservation for a room.
+     * Accessible to users with the 'ROLE_WORKER' role.
+     *
+     * @param id The ID of the room to create the weekly reservation for.
+     */
     @PreAuthorize("hasRole('ROLE_WORKER')")
     @PostMapping(value = "/{id}/weekly", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
@@ -118,6 +182,12 @@ public class RoomController {
         LOG.debug("Added weekly reservation");
     }
 
+    /**
+     * Sets a room as a priority room.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param id The ID of the room to set as priority.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}/prior")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -127,6 +197,12 @@ public class RoomController {
         LOG.debug("Room {} is PRIOR.", id);
     }
 
+    /**
+     * Sets a room as a non-priority room.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param id The ID of the room to set as non-priority.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}/nonprior")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -136,6 +212,13 @@ public class RoomController {
         LOG.debug("Room {} is NONPRIOR.", id);
     }
 
+    /**
+     * Adds equipment to a room.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param id        The ID of the room to add the equipment to.
+     * @param equipment The Equipment object to add.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(value = "/{id}/equipment", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)

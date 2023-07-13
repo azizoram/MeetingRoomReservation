@@ -24,6 +24,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controller class for managing equipment.
+ * Handles RESTful API endpoints related to equipment.
+ */
 @RestController
 @RequestMapping("/rest/equipment")
 public class EquipmentController {
@@ -34,6 +38,13 @@ public class EquipmentController {
     private final RoomService roomService;
     private final EquipmentMapper mapper;
 
+    /**
+     * Constructor for EquipmentController class.
+     *
+     * @param equipmentService The EquipmentService used for managing equipment.
+     * @param roomService      The RoomService used for managing rooms.
+     * @param mapper           The EquipmentMapper used for mapping Equipment objects to EquipmentDTO objects.
+     */
     @Autowired
     public EquipmentController(EquipmentService equipmentService, RoomService roomService, EquipmentMapper mapper) {
         this.equipmentService = equipmentService;
@@ -41,13 +52,24 @@ public class EquipmentController {
         this.mapper = mapper;
     }
 
+    /**
+     * Retrieves a list of all equipment.
+     *
+     * @return A List of EquipmentDTO objects representing the equipment.
+     */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<EquipmentDTO> getEquipment() {
         List<Equipment> equipment = equipmentService.findAllEquipments();
         return equipment.stream().map(mapper::equipmentToDTO).collect(Collectors.toList());
     }
 
-    //ADMIN
+    /**
+     * Creates a new equipment.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param equipment The Equipment object to create.
+     * @return A ResponseEntity with the HTTP headers and status code indicating the result of the operation.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createEquipment(@RequestBody Equipment equipment) {
@@ -57,6 +79,13 @@ public class EquipmentController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
+    /**
+     * Retrieves an equipment by its ID.
+     *
+     * @param id The ID of the equipment to retrieve.
+     * @return An EquipmentDTO object representing the equipment.
+     * @throws NotFoundException if the equipment with the specified ID is not found.
+     */
     @GetMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public EquipmentDTO getEquipmentById(@PathVariable Long id) {
         final Equipment equipment = equipmentService.findEquipmentById(id);
@@ -66,7 +95,15 @@ public class EquipmentController {
         return mapper.equipmentToDTO(equipment);
     }
 
-    //ADMIN
+    /**
+     * Updates an existing equipment.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param id        The ID of the equipment to update.
+     * @param equipment The updated Equipment object.
+     * @throws NotFoundException    if the equipment with the specified ID is not found.
+     * @throws ValidationException  if the ID in the request data does not match the ID in the request URL.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -82,7 +119,13 @@ public class EquipmentController {
         LOG.debug("Updated equipment {}.", equipment.getEid());
     }
 
-    //ADMIN
+    /**
+     * Removes an equipment.
+     * Only accessible to users with the 'ROLE_ADMIN' role.
+     *
+     * @param id The ID of the equipment to remove.
+     * @throws NotFoundException if the equipment with the specified ID is not found.
+     */
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
